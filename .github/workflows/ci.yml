@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/booking_app?schema=public
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.js
