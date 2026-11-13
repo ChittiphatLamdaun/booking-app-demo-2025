@@ -17,7 +17,36 @@ if (!fs.existsSync(REPORT_DIR)) {
 app.use(cors());
 app.use(express.json());
 
+// Security Headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.removeHeader('X-Powered-By');
+  next();
+});
+
 const STATUS_VALUES = ['pending', 'confirmed', 'cancelled', 'completed'];
+
+// Root & Health Check Endpoints
+app.get('/', (req, res) => {
+  res.json({
+    status: 'success',
+    message: 'Hotel Booking API is running',
+    version: '1.0.0',
+    endpoints: {
+      rooms: '/api/rooms',
+      login: '/api/login',
+      bookings: '/api/bookings',
+      reports: '/api/reports'
+    }
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
